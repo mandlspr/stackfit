@@ -17,7 +17,7 @@
   function setScreen(html) { flow.innerHTML = html; window.scrollTo({ top: Math.max(0, flow.offsetTop - 24), behavior: "smooth" }); }
 
   function taskScreen() {
-    setScreen(`<form class="question" id="taskForm"><span class="step-label">Your task</span><h2>What are you trying to accomplish?</h2><p class="helper">Describe the outcome, who it affects, and what the system should do.</p><textarea id="taskInput" required minlength="12" placeholder="For example: Review incoming support requests, suggest a response using our help centre, and let an agent approve it before sending.">${esc(state.task)}</textarea><div class="actions"><span></span>${button("Check this task", !state.task.trim())}</div></form>`);
+    setScreen(`<form class="question" id="taskForm"><span class="step-label">Your task</span><h2>What are you trying to accomplish?</h2><p class="helper">Describe the outcome, who it affects, and what the system should do.</p><textarea id="taskInput" required minlength="12" placeholder="For example: Review incoming support requests, suggest a response using our help centre, and let an agent approve it before sending.">${esc(state.task)}</textarea><div class="actions"><span></span><button class="primary" type="submit" data-next ${state.task.trim() ? "" : "disabled"}>Check this task →</button></div></form>`);
     const input = $("#taskInput"), next = $("[data-next]");
     input.addEventListener("input", () => { state.task = input.value; next.disabled = input.value.trim().length < 12; });
     $("#taskForm").addEventListener("submit", e => { e.preventDefault(); state.task = input.value.trim(); questionIndex = 0; questionScreen(); });
