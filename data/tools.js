@@ -18,3 +18,8 @@ window.STACKFIT_OVERLAP_REASONS = [
   "Provider / client constraint", "Data residency / compliance",
   "Cost optimisation", "Latency optimisation", "Other"
 ];
+
+window.STACKFIT_COVERAGE_STATUS = function (coveringCount, taskNeed) {
+  if (coveringCount === 0) return "Missing";
+  return taskNeed === 4 ? "Partial" : "Covered";
+};

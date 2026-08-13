@@ -18,7 +18,7 @@ window.STACKFIT_GOVERNANCE_STATUS = {
 
 window.STACKFIT_HAS_FAIRNESS_TRIGGER = function (task, answers) {
   const answerText = Object.values(answers || {}).join(" ");
-  return /\b(fairness|segment(?:ation|ed|ing|s)?|discriminat(?:ion|ory|e|ed|ing)?|proxy variable(?:s)?|bias(?:ed)?|unequal treatment)\b/i.test(`${task || ""} ${answerText}`);
+  return /\b(fairness|segment(?:ation|ed|ing|s)?|discriminat(?:ion|ory|e|ed|ing)?|proxy variable(?:s)?|bias(?:ed)?|unequal treatment|disparate impact|protected group(?:s)?|equity)\b/i.test(`${task || ""} ${answerText}`);
 };
 
 window.STACKFIT_FAIRNESS_STATUS = function (baseStatus, task, answers) {

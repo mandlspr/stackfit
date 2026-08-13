@@ -99,15 +99,13 @@
     return STACKFIT_CAPABILITIES.map(cap => {
       const covering = active.filter(c => c.covers.includes(cap.id));
       const need = state.capabilities[cap.id];
-      const coverage = covering.length ? 3 : 1;
-      return { cap, need, covering, coverage, fit: coverage >= Math.min(need, 3) };
+      const coverage = STACKFIT_COVERAGE_STATUS(covering.length, need);
+      return { cap, need, covering, coverage, fit: coverage === "Covered" };
     });
   }
 
   function freshness(item) {
-    const years = (new Date("2026-08-13") - new Date(item.date)) / 31557600000;
-    if (item.family === "volatile") return years <= 1 ? "Current" : years <= 2 ? "Aging" : "Stale";
-    return years <= 3 ? "Current" : years <= 7 ? "Aging" : "Stale";
+    return STACKFIT_EVIDENCE_FRESHNESS(item);
   }
 
   function resultsScreen() {
@@ -119,7 +117,7 @@
     const verdict = blocker || importantGaps.length > 2 ? "Not viable" : viable && unjustified.length ? "Overbuilt" : (mandatory || importantGaps.length) ? "Fit with conditions" : "Fit";
     const tech = importantGaps.length ? `Missing sufficient coverage for ${importantGaps.map(r => r.cap.label).join(", ")}.` : "The entered stack covers the task’s material technical requirements.";
     const gov = blocker ? "Stop: autonomous use is not acceptable for a severe-impact task without routine human review." : mandatory ? "Proceed only with the mandatory controls shown below." : "No governance blocker was identified; apply the listed safeguards.";
-    const rows = coverage.map(r => `<tr><td>${r.cap.label}</td><td><span class="level level-${STACKFIT_LEVELS[r.need-1].toLowerCase()}">${STACKFIT_LEVELS[r.need-1]}</span></td><td>${r.covering.length ? `<span class="level level-high">High</span> ${r.covering.map(c => esc(state.stack[c.id])).join(", ")}` : "Missing"}</td><td><span class="fit ${r.fit ? "fit-good" : r.need >= 3 ? "fit-stop" : "fit-gap"}">${r.fit ? "✓ Sufficient" : r.need >= 3 ? "⛔ Gap" : "⚠ Limited"}</span></td></tr>`).join("");
+    const rows = coverage.map(r => `<tr><td>${r.cap.label}</td><td><span class="level level-${STACKFIT_LEVELS[r.need-1].toLowerCase()}">${STACKFIT_LEVELS[r.need-1]}</span></td><td><span class="fit ${r.coverage === "Covered" ? "fit-good" : r.coverage === "Partial" ? "fit-gap" : "fit-stop"}">${r.coverage}</span>${r.covering.length ? ` ${r.covering.map(c => esc(state.stack[c.id])).join(", ")}` : ""}</td><td><span class="fit ${r.fit ? "fit-good" : r.coverage === "Partial" ? "fit-gap" : "fit-stop"}">${r.fit ? "✓ Sufficient" : r.coverage === "Partial" ? "⚠ Gap" : "⛔ Gap"}</span></td></tr>`).join("");
     const minFix = blocker ? "Add mandatory human approval before consequential action and obtain a qualified governance review." : importantGaps.length ? `Add ${importantGaps.map(r => categoryFor(r.cap.id)).join(", ")} coverage, then reassess.` : unjustified.length ? "Remove or justify overlapping components that do not add resilience, specialisation, validation, or compliance value." : "No material correction required.";
     const overlapHtml = state.overlaps.length ? state.overlaps.map(o => `<div class="overlap"><strong>${o.label}: ${o.tools.map(esc).join(" + ")}</strong><p>Reason: ${esc(o.reason === "Other" ? o.other || "Other (not specified)" : o.reason)}</p><p>Estimated impact — Cost: Medium · Latency: Low · Complexity: Medium. ${unjustified.includes(o) ? "Contributes to Overbuilt verdict." : "Does not by itself imply waste."}</p></div>`).join("") : "<p>No same-category overlap detected.</p>";
     const evidence = STACKFIT_EVIDENCE.map(e => `<li><strong>${e.title}</strong> — ${e.supports}<br><small>Source: ${e.source} · Updated: ${e.date} · Last checked: ${e.checked} · ${freshness(e)}</small></li>`).join("");

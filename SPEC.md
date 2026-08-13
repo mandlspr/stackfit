@@ -167,10 +167,17 @@ Suggested columns:
 
 Example:
 
-| Reasoning | High | High | ✓ |
-| Reliability | Critical | Medium | ⚠ |
-| Retrieval | High | High | ✓ |
+| Reasoning | High | Covered | ✓ |
+| Reliability | Critical | Partial | ⚠ |
+| Retrieval | High | Covered | ✓ |
 | Human oversight | Required | Missing | ⛔ |
+
+Stack coverage strength uses only:
+- `Covered` — a relevant stack category is present and the task need is not Critical
+- `Partial` — some relevant coverage exists, but the available evidence cannot establish sufficient coverage for the task need
+- `Missing` — no relevant stack category is present
+
+Do not express stack coverage as Low / Medium / High or imply benchmark-level product performance without reliable evidence. The task requirement scale remains Low / Medium / High / Critical.
 
 ## 9. Overall Verdict
 
@@ -264,7 +271,7 @@ Every evidence item should have a simple freshness status:
 - Aging
 - Stale
 
-Use only two internal freshness families:
+Use two general internal freshness families:
 
 ### Volatile
 Examples:
@@ -284,6 +291,17 @@ Examples:
 - methodological frameworks
 
 These age more slowly.
+
+### Legal / regulatory sources
+
+Legal and regulatory evidence uses a separate internal freshness rule. Do not determine freshness from the original publication date alone.
+
+Evaluate:
+- whether the source is still in force/current
+- the last official verification/check date
+- whether it has been amended, superseded, or replaced
+
+An in-force source with recently verified official status may remain `Current` even when its original publication date is old. A superseded or replaced source is `Stale`; an unverified amendment or aging official check makes it at least `Aging`.
 
 Detailed evidence view should show:
 - Source
