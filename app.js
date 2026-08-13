@@ -58,7 +58,7 @@
       privacy: regulated ? "mandatory" : sensitive ? "review" : a.data.startsWith("Internal") ? "safeguard" : "clear",
       oversight: severe && autonomous ? "stop" : (severe || high || monitored || autonomous) ? "mandatory" : "safeguard",
       transparency: (high || severe) ? "review" : "safeguard",
-      fairness: severe ? "mandatory" : high ? "review" : "clear",
+      fairness: STACKFIT_FAIRNESS_STATUS(severe ? "mandatory" : high ? "review" : "clear", state.task, a),
       security: (regulated || autonomous) ? "mandatory" : sensitive ? "review" : "safeguard",
       accountability: (high || severe || monitored || autonomous) ? "mandatory" : "safeguard",
       regulatory: severe ? "review" : regulated ? "review" : "clear"

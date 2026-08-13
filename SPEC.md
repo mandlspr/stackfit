@@ -67,6 +67,15 @@ Do NOT show specific products/models at this stage.
 
 ## 5. Governance Check
 
+### Fairness trigger rule
+
+If the task or user answers mention fairness, segmentation, discrimination, proxy variables, bias, or unequal treatment, `Fairness / Bias` must not default to `🟢 No specific blocker identified`.
+
+Minimum default:
+`🟡 Safeguards required`
+
+A green status is only allowed when the tool has enough context to justify why no meaningful fairness concern applies.
+
 Governance is a **non-compensable gate**.
 
 A strong technical fit must never cancel a governance blocker.
