@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Check whether your current AI and tool stack fits the task.">
+  <title>StackFit — AI stack fit checker</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="StackFit home"><span class="brand-mark">S</span>StackFit</a>
+    <button id="resetButton" class="text-button" type="button" hidden>Start over</button>
+  </header>
+
+  <main>
+    <section id="intro" class="intro">
+      <p class="eyebrow">AI stack fit checker</p>
+      <h1>Start with the task.<br><span>Then test the stack.</span></h1>
+      <p class="lede">Find out what your task actually needs, whether your current tools cover it, and where governance or complexity changes the answer.</p>
+    </section>
+
+    <section id="flow" class="flow-shell" aria-live="polite"></section>
+  </main>
+
+  <footer>Private by design · Your answers stay in this browser</footer>
+
+  <script src="data/capabilities.js"></script>
+  <script src="data/governance.js"></script>
+  <script src="data/tools.js"></script>
+  <script src="data/evidence.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
