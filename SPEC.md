@@ -62,6 +62,13 @@ Dimensions:
 7. Multimodality
 8. Long-horizon
 
+Context calibration:
+- When the same decision flow combines a user-provided note or input, account-level data, and additional portfolio or database context, Context must be at least `Medium`.
+
+Long-horizon calibration:
+- A short, explicitly wired deterministic workflow is `Medium`, even when it contains many steps.
+- Reserve `High` for sustained goal pursuit, planning, re-evaluation, or extended autonomous execution.
+
 Do NOT classify capabilities as Required / Recommended / Nice to have.
 Do NOT show specific products/models at this stage.
 

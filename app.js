@@ -45,7 +45,8 @@
     if (state.answers.inputs.includes("images")) raise(["multimodality"], 3);
     if (/image|audio|video|scan|photo|voice/.test(text)) raise(["multimodality"], 3);
     if (/api|send|publish|update|create|execute|automat|agent/.test(text)) raise(["toolUse"], 3);
-    if (/multi.step|workflow|ongoing|monitor|project/.test(text)) raise(["longHorizon"], 3);
+    raise(["context"], STACKFIT_CONTEXT_LEVEL(state.task));
+    raise(["longHorizon"], STACKFIT_LONG_HORIZON_LEVEL(state.task));
     state.capabilities = levels;
     buildGovernance();
     profileScreen();

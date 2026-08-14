@@ -10,3 +10,18 @@ window.STACKFIT_CAPABILITIES = [
 ];
 
 window.STACKFIT_LEVELS = ["Low", "Medium", "High", "Critical"];
+
+window.STACKFIT_CONTEXT_LEVEL = function (task) {
+  const text = task || "";
+  const hasUserInput = /\b(user[- ]provided|note|input|submission|message)\b/i.test(text);
+  const hasAccountData = /\b(account[- ]level|account data|account record|customer account)\b/i.test(text);
+  const hasAdditionalContext = /\b(portfolio|database|supabase|data context)\b/i.test(text);
+  return hasUserInput && hasAccountData && hasAdditionalContext ? 2 : 1;
+};
+
+window.STACKFIT_LONG_HORIZON_LEVEL = function (task) {
+  const text = task || "";
+  if (/\b(sustained goal pursuit|extended autonomous execution|re-evaluat(?:e|es|ion|ing)|reassess(?:ment|es|ing)?|long-running autonomous|adaptive planning)\b/i.test(text)) return 3;
+  if (/\b(workflow|pipeline|multi-step|webhook|redaction|merge)\b|→/i.test(text)) return 2;
+  return 1;
+};
