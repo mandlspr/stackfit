@@ -44,7 +44,7 @@
     if (state.answers.inputs.startsWith("Current")) raise(["retrieval", "toolUse"], 3);
     if (state.answers.inputs.includes("images")) raise(["multimodality"], 3);
     if (/image|audio|video|scan|photo|voice/.test(text)) raise(["multimodality"], 3);
-    if (/api|send|publish|update|create|execute|automat|agent/.test(text)) raise(["toolUse"], 3);
+    raise(["toolUse"], STACKFIT_TOOL_USE_LEVEL(state.task, state.answers));
     raise(["context"], STACKFIT_CONTEXT_LEVEL(state.task));
     raise(["longHorizon"], STACKFIT_LONG_HORIZON_LEVEL(state.task));
     state.capabilities = levels;
@@ -53,17 +53,8 @@
   }
 
   function buildGovernance() {
-    const a = state.answers, severe = a.impact.startsWith("Severe"), high = a.impact.startsWith("High"), sensitive = a.data.startsWith("Personal"), regulated = a.data.startsWith("Highly");
-    const autonomous = a.operation.includes("without"), monitored = a.operation.includes("monitoring");
-    state.governance = {
-      privacy: regulated ? "mandatory" : sensitive ? "review" : a.data.startsWith("Internal") ? "safeguard" : "clear",
-      oversight: severe && autonomous ? "stop" : (severe || high || monitored || autonomous) ? "mandatory" : "safeguard",
-      transparency: (high || severe) ? "review" : "safeguard",
-      fairness: STACKFIT_FAIRNESS_STATUS(severe ? "mandatory" : high ? "review" : "clear", state.task, a),
-      security: (regulated || autonomous) ? "mandatory" : sensitive ? "review" : "safeguard",
-      accountability: (high || severe || monitored || autonomous) ? "mandatory" : "safeguard",
-      regulatory: severe ? "review" : regulated ? "review" : "clear"
-    };
+    const a = state.answers, severe = a.impact.startsWith("Severe"), regulated = a.data.startsWith("Highly");
+    state.governance = STACKFIT_GOVERNANCE_ASSESSMENT(state.task, a);
     state.governanceConfidence = (severe || regulated) ? "Medium" : "High";
   }
 
@@ -101,7 +92,7 @@
       const covering = active.filter(c => c.covers.includes(cap.id));
       const need = state.capabilities[cap.id];
       const coverage = STACKFIT_COVERAGE_STATUS(covering.length, need);
-      return { cap, need, covering, coverage, fit: coverage === "Covered" };
+      return { cap, need, covering, coverage, fit: STACKFIT_COVERAGE_IS_SUFFICIENT(coverage, need) };
     });
   }
 
@@ -110,12 +101,11 @@
   }
 
   function resultsScreen() {
-    const coverage = assessCoverage(), importantGaps = coverage.filter(r => r.need >= 3 && !r.fit);
+    const coverage = assessCoverage(), importantGaps = coverage.filter(r => STACKFIT_IS_BLOCKING_TECHNICAL_GAP(r.coverage, r.need));
     const blocker = Object.values(state.governance).includes("stop");
     const mandatory = Object.values(state.governance).includes("mandatory");
     const unjustified = state.overlaps.filter(o => !["Fallback / resilience","Specialisation by task","Validation / comparison","Provider / client constraint","Data residency / compliance"].includes(o.reason));
-    const viable = !blocker && importantGaps.length === 0;
-    const verdict = blocker || importantGaps.length > 2 ? "Not viable" : viable && unjustified.length ? "Overbuilt" : (mandatory || importantGaps.length) ? "Fit with conditions" : "Fit";
+    const verdict = STACKFIT_OVERALL_VERDICT(state.governance, importantGaps.length, unjustified.length);
     const tech = importantGaps.length ? `Missing sufficient coverage for ${importantGaps.map(r => r.cap.label).join(", ")}.` : "The entered stack covers the task’s material technical requirements.";
     const gov = blocker ? "Stop: autonomous use is not acceptable for a severe-impact task without routine human review." : mandatory ? "Proceed only with the mandatory controls shown below." : "No governance blocker was identified; apply the listed safeguards.";
     const rows = coverage.map(r => `<tr><td>${r.cap.label}</td><td><span class="level level-${STACKFIT_LEVELS[r.need-1].toLowerCase()}">${STACKFIT_LEVELS[r.need-1]}</span></td><td><span class="fit ${r.coverage === "Covered" ? "fit-good" : r.coverage === "Partial" ? "fit-gap" : "fit-stop"}">${r.coverage}</span>${r.covering.length ? ` ${r.covering.map(c => esc(state.stack[c.id])).join(", ")}` : ""}</td><td><span class="fit ${r.fit ? "fit-good" : r.coverage === "Partial" ? "fit-gap" : "fit-stop"}">${r.fit ? "✓ Sufficient" : r.coverage === "Partial" ? "⚠ Gap" : "⛔ Gap"}</span></td></tr>`).join("");

@@ -26,3 +26,27 @@ window.STACKFIT_FAIRNESS_STATUS = function (baseStatus, task, answers) {
     ? "safeguard"
     : baseStatus;
 };
+
+window.STACKFIT_GOVERNANCE_ASSESSMENT = function (task, answers) {
+  const a = answers || {};
+  const severe = (a.impact || "").startsWith("Severe");
+  const high = (a.impact || "").startsWith("High");
+  const sensitive = (a.data || "").startsWith("Personal");
+  const regulated = (a.data || "").startsWith("Highly");
+  const internal = (a.data || "").startsWith("Internal");
+  const lowImpact = (a.impact || "").startsWith("Low");
+  const draftOnly = (a.operation || "").startsWith("Draft or advise only");
+  const autonomous = (a.operation || "").includes("without");
+  const monitored = (a.operation || "").includes("monitoring");
+  const lowRiskDraft = internal && lowImpact && draftOnly;
+
+  return {
+    privacy: regulated ? "mandatory" : sensitive ? "review" : lowRiskDraft ? "clear" : internal ? "safeguard" : "clear",
+    oversight: severe && autonomous ? "stop" : (severe || high || monitored || autonomous) ? "mandatory" : lowRiskDraft ? "clear" : "safeguard",
+    transparency: (high || severe) ? "review" : lowRiskDraft ? "clear" : "safeguard",
+    fairness: window.STACKFIT_FAIRNESS_STATUS(severe ? "mandatory" : high ? "review" : "clear", task, a),
+    security: (regulated || autonomous) ? "mandatory" : sensitive ? "review" : lowRiskDraft ? "clear" : "safeguard",
+    accountability: (high || severe || monitored || autonomous) ? "mandatory" : lowRiskDraft ? "clear" : "safeguard",
+    regulatory: severe || regulated ? "review" : "clear"
+  };
+};

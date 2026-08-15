@@ -69,6 +69,10 @@ Long-horizon calibration:
 - A short, explicitly wired deterministic workflow is `Medium`, even when it contains many steps.
 - Reserve `High` for sustained goal pursuit, planning, re-evaluation, or extended autonomous execution.
 
+Tool Use calibration:
+- A task that only drafts or advises from user-provided text is `Low` when it does not publish automatically, call APIs, access a database, or take external actions.
+- Do not recommend `Execution / APIs` unless the task materially requires tool execution.
+
 Do NOT classify capabilities as Required / Recommended / Nice to have.
 Do NOT show specific products/models at this stage.
 
@@ -82,6 +86,10 @@ Minimum default:
 `🟡 Safeguards required`
 
 A green status is only allowed when the tool has enough context to justify why no meaningful fairness concern applies.
+
+Low-risk internal drafting calibration:
+- For non-sensitive internal business information, low consequence of error, draft/advice-only operation, human review before publication, no customer data, and no automated publishing or external action, Privacy / Data sensitivity, Human oversight, Transparency, Security / Robustness, and Accountability / Auditability may be `🟢 No specific blocker identified`.
+- Fairness / Bias and Regulatory exposure may also remain green unless a task-specific trigger exists.
 
 Governance is a **non-compensable gate**.
 
@@ -183,6 +191,8 @@ Stack coverage strength uses only:
 - `Covered` — a relevant stack category is present and the task need is not Critical
 - `Partial` — some relevant coverage exists, but the available evidence cannot establish sufficient coverage for the task need
 - `Missing` — no relevant stack category is present
+
+Coverage affects the verdict only when the task materially requires the capability. A `Low` task need is sufficient without a dedicated stack component and must not create a blocking gap. In particular, Low Autonomy, Knowledge / Retrieval, and Long-horizon needs do not require orchestration, retrieval, or memory components.
 
 Do not express stack coverage as Low / Medium / High or imply benchmark-level product performance without reliable evidence. The task requirement scale remains Low / Medium / High / Critical.
 

@@ -23,3 +23,21 @@ window.STACKFIT_COVERAGE_STATUS = function (coveringCount, taskNeed) {
   if (coveringCount === 0) return "Missing";
   return taskNeed === 4 ? "Partial" : "Covered";
 };
+
+window.STACKFIT_COVERAGE_IS_SUFFICIENT = function (coverage, taskNeed) {
+  return taskNeed === 1 || coverage === "Covered";
+};
+
+window.STACKFIT_IS_BLOCKING_TECHNICAL_GAP = function (coverage, taskNeed) {
+  return taskNeed >= 3 && !window.STACKFIT_COVERAGE_IS_SUFFICIENT(coverage, taskNeed);
+};
+
+window.STACKFIT_OVERALL_VERDICT = function (governance, importantGapCount, unjustifiedOverlapCount) {
+  const statuses = Object.values(governance || {});
+  const blocker = statuses.includes("stop");
+  const mandatory = statuses.includes("mandatory");
+  const viable = !blocker && importantGapCount === 0;
+  if (blocker || importantGapCount > 2) return "Not viable";
+  if (viable && unjustifiedOverlapCount) return "Overbuilt";
+  return mandatory || importantGapCount ? "Fit with conditions" : "Fit";
+};

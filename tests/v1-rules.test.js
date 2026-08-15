@@ -32,4 +32,35 @@ assert.equal(context.window.STACKFIT_COVERAGE_STATUS(0, 3), "Missing");
 assert.equal(context.window.STACKFIT_CONTEXT_LEVEL(handshake.task), 2, "Handshake Context must be Medium");
 assert.equal(context.window.STACKFIT_LONG_HORIZON_LEVEL(handshake.task), 2, "Handshake Long-horizon must be Medium");
 
+// Exact V1 contrast scenario: internal marketing drafting, reviewed by a human,
+// with no customer data, automated publishing, API/database access, or external action.
+const marketingDraft = {
+  task: "Draft internal marketing copy from text I provide for a human to review before publication. It uses non-sensitive internal business information, has a low consequence of error, uses no customer data, and performs no automated publishing, API calls, database access, or external actions.",
+  answers: {
+    data: "Internal business information",
+    impact: "Low impact — easy to correct",
+    operation: "Draft or advise only",
+    inputs: "Mostly text I provide"
+  }
+};
+
+assert.equal(context.window.STACKFIT_TOOL_USE_LEVEL(marketingDraft.task, marketingDraft.answers), 1, "Draft-only Tool Use must be Low");
+for (const capability of ["autonomy", "retrieval", "longHorizon", "toolUse"]) {
+  assert.equal(
+    context.window.STACKFIT_COVERAGE_IS_SUFFICIENT(context.window.STACKFIT_COVERAGE_STATUS(0, 1), 1),
+    true,
+    `Missing dedicated ${capability} coverage must not block a Low task need`
+  );
+}
+assert.equal(context.window.STACKFIT_IS_BLOCKING_TECHNICAL_GAP("Missing", 1), false);
+const marketingGovernance = context.window.STACKFIT_GOVERNANCE_ASSESSMENT(marketingDraft.task, marketingDraft.answers);
+for (const area of ["privacy", "oversight", "transparency", "security", "accountability", "fairness", "regulatory"]) {
+  assert.equal(marketingGovernance[area], "clear", `${area} may remain green for the low-risk marketing draft`);
+}
+const marketingHasBlocker = Object.values(marketingGovernance).some(status => status === "stop" || status === "mandatory");
+const marketingHasTechnicalGap = context.window.STACKFIT_IS_BLOCKING_TECHNICAL_GAP("Missing", 1);
+assert.equal(marketingHasBlocker, false);
+assert.equal(marketingHasTechnicalGap, false);
+assert.equal(context.window.STACKFIT_OVERALL_VERDICT(marketingGovernance, 0, 0), "Fit", "Marketing draft verdict must be Fit");
+
 console.log("StackFit V1 targeted rule tests passed");

@@ -25,3 +25,12 @@ window.STACKFIT_LONG_HORIZON_LEVEL = function (task) {
   if (/\b(workflow|pipeline|multi-step|webhook|redaction|merge)\b|→/i.test(text)) return 2;
   return 1;
 };
+
+window.STACKFIT_TOOL_USE_LEVEL = function (task, answers) {
+  const text = task || "";
+  const operation = (answers && answers.operation) || "";
+  const draftOnly = operation.startsWith("Draft or advise only");
+  const affirmativeText = text.replace(/\b(?:no|without)\b[^.?!]*/gi, "");
+  const requiresExecution = /\b(api|webhook|send|publish|deploy|update (?:a |the )?(?:record|database|crm)|execute|automated? publishing|external action|database access)\b/i.test(affirmativeText);
+  return draftOnly && !requiresExecution ? 1 : requiresExecution ? 3 : 1;
+};
