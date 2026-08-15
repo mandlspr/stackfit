@@ -1,12 +1,14 @@
 # StackFit
 
-A small, rule-based AI stack fit checker built from `SPEC.md`.
+A small, rule-based checker for whether an AI/tool stack fits a task, under what conditions, and with how much unnecessary complexity.
+
+**Task first. Capabilities second. Products last.**
 
 **Live demo:** https://mandlspr.github.io/stackfit/
 
 ## Validation & Scope
 
-**What StackFit checks**
+**What StackFit does**
 
 - Task capability requirements
 - Governance conditions
@@ -15,7 +17,7 @@ A small, rule-based AI stack fit checker built from `SPEC.md`.
 - Evidence freshness
 - Overall verdict: Fit / Fit with conditions / Overbuilt / Not viable
 
-**What StackFit does not check**
+**What StackFit does not do**
 
 - Live credentials
 - API availability
@@ -27,10 +29,18 @@ A small, rule-based AI stack fit checker built from `SPEC.md`.
 **Validated against 3 contrasting use cases**
 
 - Internal marketing draft → low-risk / minimal stack / Fit
-- Handshake governance workflow → Fit with governance safeguards/review
-- Recruitment scoring → mandatory controls / high regulatory exposure
+- Handshake governance workflow → Fit with safeguards/review
+- Recruitment scoring → Not viable as designed / mandatory controls
 
 See [StackFit V1.1 — Three Validation Tests](docs/StackFit_V1.1_Three_Validation_Tests.md).
+
+**V1.1 status:** The current logic is frozen after regression and live validation.
+
+## Known limitations
+
+- The question flow is not yet fully adaptive by use case.
+- StackFit does not validate live runtime, API, authentication, connectivity, or uptime.
+- Evidence is advisory and dimension-specific, not a universal model score.
 
 ## Run locally
 
