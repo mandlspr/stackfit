@@ -32,6 +32,14 @@ window.STACKFIT_IS_BLOCKING_TECHNICAL_GAP = function (coverage, taskNeed) {
   return taskNeed >= 3 && !window.STACKFIT_COVERAGE_IS_SUFFICIENT(coverage, taskNeed);
 };
 
+window.STACKFIT_GAP_CORRECTION = function (capabilityId, capabilityLabel, coveringCategoryLabels, missingCategoryLabel) {
+  if (!coveringCategoryLabels.length) return `Add ${missingCategoryLabel} coverage.`;
+  if (capabilityId === "reliability") return "Reliability: strengthen validation, testing, and pre-decision human review.";
+  if (capabilityId === "autonomy") return "Autonomy: constrain automated decision authority and require human approval before consequential action.";
+  if (capabilityId === "toolUse") return "Tool Use: strengthen execution controls around external system actions.";
+  return `${capabilityLabel}: strengthen or validate the existing ${coveringCategoryLabels.join(", ")} coverage.`;
+};
+
 window.STACKFIT_OVERALL_VERDICT = function (governance, importantGapCount, unjustifiedOverlapCount) {
   const statuses = Object.values(governance || {});
   const blocker = statuses.includes("stop");

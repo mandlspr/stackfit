@@ -200,6 +200,8 @@ Stack coverage strength uses only:
 
 Coverage affects the verdict only when the task materially requires the capability. A `Low` task need is sufficient without a dedicated stack component and must not create a blocking gap. In particular, Low Autonomy, Knowledge / Retrieval, and Long-horizon needs do not require orchestration, retrieval, or memory components.
 
+Minimum corrections must distinguish `Partial` from `Missing` coverage. When a relevant stack category is present but provides only Partial coverage, recommend strengthening, constraining, validating, or adding controls within the existing category; never say to add that category. Use `Add [category]` only when the category is genuinely missing.
+
 Do not express stack coverage as Low / Medium / High or imply benchmark-level product performance without reliable evidence. The task requirement scale remains Low / Medium / High / Critical.
 
 ## 9. Overall Verdict

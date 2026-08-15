@@ -81,5 +81,39 @@ assert.equal(recruitmentGovernance.fairness, "mandatory", "Recruitment Fairness 
 assert.equal(recruitmentGovernance.regulatory, "mandatory", "Recruitment Regulatory exposure must require mandatory controls");
 assert.equal(recruitmentGovernance.oversight, "mandatory", "Automated rejection must require mandatory human oversight");
 assert.notEqual(recruitmentGovernance.oversight, "stop", "Automated rejection must not label the use case prohibited");
+const recruitmentStack = {
+  llm: "GPT-5.6",
+  database: "ATS / Applicant database",
+  orchestration: "n8n",
+  approval: "Recruiter review after AI screening",
+  monitoring: "Audit log",
+  guardrails: "Access controls + PII handling",
+  evaluation: "Bias / fairness testing",
+  execution: "ATS API",
+  other: "Automated rejection threshold"
+};
+const recruitmentCategories = context.window.STACKFIT_TOOL_CATEGORIES.filter(category => recruitmentStack[category.id]);
+for (const categoryId of Object.keys(recruitmentStack)) {
+  assert.ok(recruitmentCategories.some(category => category.id === categoryId), `${categoryId} must remain recognized as present`);
+}
+const recruitmentGaps = context.window.STACKFIT_CAPABILITIES.map(capability => {
+  const covering = recruitmentCategories.filter(category => category.covers.includes(capability.id));
+  const need = recruitmentCapabilities[capability.id];
+  const coverage = context.window.STACKFIT_COVERAGE_STATUS(covering.length, need);
+  return { capability, covering, need, coverage };
+}).filter(row => context.window.STACKFIT_IS_BLOCKING_TECHNICAL_GAP(row.coverage, row.need));
+assert.deepEqual(Array.from(recruitmentGaps, row => row.capability.id), ["reliability", "autonomy", "toolUse"]);
+assert.ok(recruitmentGaps.every(row => row.coverage === "Partial" && row.covering.length > 0), "Critical gaps must retain Partial coverage from existing categories");
+assert.equal(context.window.STACKFIT_OVERALL_VERDICT(recruitmentGovernance, recruitmentGaps.length, 0), "Not viable");
+const recruitmentCorrection = recruitmentGaps.map(row => context.window.STACKFIT_GAP_CORRECTION(
+  row.capability.id,
+  row.capability.label,
+  row.covering.map(category => category.label),
+  row.covering[0].label
+)).join(" ");
+assert.match(recruitmentCorrection, /strengthen validation, testing, and pre-decision human review/i);
+assert.match(recruitmentCorrection, /constrain automated decision authority and require human approval/i);
+assert.match(recruitmentCorrection, /strengthen execution controls/i);
+assert.doesNotMatch(recruitmentCorrection, /Add (?:LLM \/ Model|Orchestration \/ Automation|Execution \/ APIs)/i);
 
 console.log("StackFit V1 targeted rule tests passed");
