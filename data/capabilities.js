@@ -22,7 +22,8 @@ window.STACKFIT_CONTEXT_LEVEL = function (task) {
 window.STACKFIT_LONG_HORIZON_LEVEL = function (task) {
   const text = task || "";
   if (/\b(sustained goal pursuit|extended autonomous execution|re-evaluat(?:e|es|ion|ing)|reassess(?:ment|es|ing)?|long-running autonomous|adaptive planning)\b/i.test(text)) return 3;
-  if (/\b(workflow|pipeline|multi-step|webhook|redaction|merge)\b|→/i.test(text)) return 2;
+  const deterministicRecruitmentFlow = /\b(score|scoring|rank|ranking)\b/i.test(text) && /\b(reject|rejection|threshold)\b/i.test(text);
+  if (deterministicRecruitmentFlow || /\b(workflow|pipeline|multi-step|webhook|redaction|merge)\b|→/i.test(text)) return 2;
   return 1;
 };
 
@@ -33,4 +34,25 @@ window.STACKFIT_TOOL_USE_LEVEL = function (task, answers) {
   const affirmativeText = text.replace(/\b(?:no|without)\b[^.?!]*/gi, "");
   const requiresExecution = /\b(api|webhook|send|publish|deploy|update (?:a |the )?(?:record|database|crm)|execute|automated? publishing|external action|database access)\b/i.test(affirmativeText);
   return draftOnly && !requiresExecution ? 1 : requiresExecution ? 3 : 1;
+};
+
+window.STACKFIT_CAPABILITY_ASSESSMENT = function (task, answers) {
+  const a = answers || {};
+  const text = (task || "").toLowerCase();
+  const levels = Object.fromEntries(window.STACKFIT_CAPABILITIES.map(capability => [capability.id, 1]));
+  const raise = (ids, level) => ids.forEach(id => levels[id] = Math.max(levels[id], level));
+
+  raise(["reasoning"], /analy|decid|plan|strateg|research|diagnos|review/.test(text) ? 2 : 1);
+  raise(["reliability"], (a.impact || "").startsWith("High") ? 3 : (a.impact || "").startsWith("Severe") ? 4 : 2);
+  if ((a.operation || "").includes("approval")) raise(["toolUse", "reliability"], 3);
+  if ((a.operation || "").includes("monitoring")) raise(["autonomy", "toolUse"], 3);
+  if ((a.operation || "").includes("without")) raise(["autonomy", "toolUse", "reliability"], 4);
+  if ((a.inputs || "").startsWith("Long")) raise(["context"], 3);
+  if ((a.inputs || "").startsWith("Current")) raise(["retrieval", "toolUse"], 3);
+  if ((a.inputs || "").includes("images")) raise(["multimodality"], 3);
+  if (/image|audio|video|scan|photo|voice/.test(text)) raise(["multimodality"], 3);
+  raise(["toolUse"], window.STACKFIT_TOOL_USE_LEVEL(task, a));
+  raise(["context"], window.STACKFIT_CONTEXT_LEVEL(task));
+  raise(["longHorizon"], window.STACKFIT_LONG_HORIZON_LEVEL(task));
+  return levels;
 };

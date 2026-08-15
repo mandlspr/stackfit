@@ -68,6 +68,7 @@ Context calibration:
 Long-horizon calibration:
 - A short, explicitly wired deterministic workflow is `Medium`, even when it contains many steps.
 - Reserve `High` for sustained goal pursuit, planning, re-evaluation, or extended autonomous execution.
+- Long-horizon is independent of consequence severity. A deterministic recruitment pipeline such as CV + interview notes → scoring → ranking → threshold → rejection is `Medium`; severe impact does not raise it to High or Critical.
 
 Tool Use calibration:
 - A task that only drafts or advises from user-provided text is `Low` when it does not publish automatically, call APIs, access a database, or take external actions.
@@ -94,6 +95,11 @@ Low-risk internal drafting calibration:
 Governance is a **non-compensable gate**.
 
 A strong technical fit must never cancel a governance blocker.
+
+Recruitment and oversight calibration:
+- AI-based recruitment, candidate scoring, ranking, selection, or automated rejection sets `Regulatory exposure` to at least `🔴 Mandatory controls`.
+- Automated rejection or a similarly significant decision without routine human review requires `🔴 Mandatory controls` for Human oversight: the current design is not acceptable as-is.
+- Use `⛔ Prohibited / Stop` only when the use case itself is genuinely prohibited, not merely because mandatory human oversight is absent from the current design.
 
 Evaluate:
 - Privacy / Data sensitivity

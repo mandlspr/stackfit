@@ -39,14 +39,15 @@ window.STACKFIT_GOVERNANCE_ASSESSMENT = function (task, answers) {
   const autonomous = (a.operation || "").includes("without");
   const monitored = (a.operation || "").includes("monitoring");
   const lowRiskDraft = internal && lowImpact && draftOnly;
+  const recruitment = /\brecruit(?:ment|ing)\b/i.test(task || "") || (/\b(?:(?:job )?applicant(?:s)?|candidate(?:s)?)\b/i.test(task || "") && /\b(?:score|scoring|rank|ranking|select|selection|reject|rejection)\b/i.test(task || ""));
 
   return {
     privacy: regulated ? "mandatory" : sensitive ? "review" : lowRiskDraft ? "clear" : internal ? "safeguard" : "clear",
-    oversight: severe && autonomous ? "stop" : (severe || high || monitored || autonomous) ? "mandatory" : lowRiskDraft ? "clear" : "safeguard",
+    oversight: (severe || high || monitored || autonomous) ? "mandatory" : lowRiskDraft ? "clear" : "safeguard",
     transparency: (high || severe) ? "review" : lowRiskDraft ? "clear" : "safeguard",
     fairness: window.STACKFIT_FAIRNESS_STATUS(severe ? "mandatory" : high ? "review" : "clear", task, a),
     security: (regulated || autonomous) ? "mandatory" : sensitive ? "review" : lowRiskDraft ? "clear" : "safeguard",
     accountability: (high || severe || monitored || autonomous) ? "mandatory" : lowRiskDraft ? "clear" : "safeguard",
-    regulatory: severe || regulated ? "review" : "clear"
+    regulatory: recruitment ? "mandatory" : severe || regulated ? "review" : "clear"
   };
 };

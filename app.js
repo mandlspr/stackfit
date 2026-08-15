@@ -32,22 +32,7 @@
   }
 
   function buildAssessment() {
-    const text = state.task.toLowerCase();
-    const levels = Object.fromEntries(STACKFIT_CAPABILITIES.map(c => [c.id, 1]));
-    const raise = (ids, level) => ids.forEach(id => levels[id] = Math.max(levels[id], level));
-    raise(["reasoning"], /analy|decid|plan|strateg|research|diagnos|review/.test(text) ? 2 : 1);
-    raise(["reliability"], state.answers.impact.startsWith("High") ? 3 : state.answers.impact.startsWith("Severe") ? 4 : 2);
-    if (state.answers.operation.includes("approval")) raise(["toolUse", "reliability"], 3);
-    if (state.answers.operation.includes("monitoring")) raise(["autonomy", "toolUse", "longHorizon"], 3);
-    if (state.answers.operation.includes("without")) raise(["autonomy", "toolUse", "longHorizon", "reliability"], 4);
-    if (state.answers.inputs.startsWith("Long")) raise(["context", "longHorizon"], 3);
-    if (state.answers.inputs.startsWith("Current")) raise(["retrieval", "toolUse"], 3);
-    if (state.answers.inputs.includes("images")) raise(["multimodality"], 3);
-    if (/image|audio|video|scan|photo|voice/.test(text)) raise(["multimodality"], 3);
-    raise(["toolUse"], STACKFIT_TOOL_USE_LEVEL(state.task, state.answers));
-    raise(["context"], STACKFIT_CONTEXT_LEVEL(state.task));
-    raise(["longHorizon"], STACKFIT_LONG_HORIZON_LEVEL(state.task));
-    state.capabilities = levels;
+    state.capabilities = STACKFIT_CAPABILITY_ASSESSMENT(state.task, state.answers);
     buildGovernance();
     profileScreen();
   }

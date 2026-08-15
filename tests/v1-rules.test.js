@@ -63,4 +63,23 @@ assert.equal(marketingHasBlocker, false);
 assert.equal(marketingHasTechnicalGap, false);
 assert.equal(context.window.STACKFIT_OVERALL_VERDICT(marketingGovernance, 0, 0), "Fit", "Marketing draft verdict must be Fit");
 
+const recruitment = {
+  task: "Use AI to score job applicants based on CVs and interview notes, rank candidates, and automatically reject applicants below a defined score. Recruiters review only the remaining candidates.",
+  answers: {
+    data: "Personal or confidential data",
+    impact: "Severe impact — safety, rights, employment, credit or legal status",
+    operation: "Act autonomously without routine review",
+    inputs: "Long documents or conversation history"
+  }
+};
+const recruitmentCapabilities = context.window.STACKFIT_CAPABILITY_ASSESSMENT(recruitment.task, recruitment.answers);
+assert.equal(recruitmentCapabilities.reliability, 4, "Recruitment Reliability must be Critical");
+assert.equal(recruitmentCapabilities.context, 3, "Recruitment Context must be High");
+assert.equal(recruitmentCapabilities.longHorizon, 2, "Deterministic recruitment Long-horizon must be Medium");
+const recruitmentGovernance = context.window.STACKFIT_GOVERNANCE_ASSESSMENT(recruitment.task, recruitment.answers);
+assert.equal(recruitmentGovernance.fairness, "mandatory", "Recruitment Fairness / Bias must require mandatory controls");
+assert.equal(recruitmentGovernance.regulatory, "mandatory", "Recruitment Regulatory exposure must require mandatory controls");
+assert.equal(recruitmentGovernance.oversight, "mandatory", "Automated rejection must require mandatory human oversight");
+assert.notEqual(recruitmentGovernance.oversight, "stop", "Automated rejection must not label the use case prohibited");
+
 console.log("StackFit V1 targeted rule tests passed");
