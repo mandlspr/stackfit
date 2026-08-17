@@ -43,9 +43,19 @@ window.STACKFIT_GAP_CORRECTION = function (capabilityId, capabilityLabel, coveri
 window.STACKFIT_OVERALL_VERDICT = function (governance, importantGapCount, unjustifiedOverlapCount) {
   const statuses = Object.values(governance || {});
   const blocker = statuses.includes("stop");
-  const mandatory = statuses.includes("mandatory");
-  const viable = !blocker && importantGapCount === 0;
+  const governanceConditions = statuses.some(status => ["safeguard", "review", "mandatory"].includes(status));
   if (blocker || importantGapCount > 2) return "Not viable";
-  if (viable && unjustifiedOverlapCount) return "Overbuilt";
-  return mandatory || importantGapCount ? "Fit with conditions" : "Fit";
+  if (importantGapCount || governanceConditions) return "Fit with conditions";
+  if (unjustifiedOverlapCount) return "Overbuilt";
+  return "Fit";
+};
+
+window.STACKFIT_GOVERNANCE_SUMMARY = function (governance, technicalSufficient) {
+  const statuses = Object.values(governance || {});
+  if (statuses.includes("stop")) return "Stop: the current design has a blocking governance condition.";
+  if (statuses.includes("mandatory")) return "Proceed only with the mandatory controls shown below.";
+  if (statuses.some(status => status === "review" || status === "safeguard")) {
+    return `${technicalSufficient ? "Technical coverage is sufficient. " : ""}Governance reviews and safeguards must be addressed before deployment.`;
+  }
+  return "No specific governance blocker or unresolved condition was identified.";
 };

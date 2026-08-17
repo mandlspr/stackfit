@@ -32,6 +32,33 @@ assert.equal(context.window.STACKFIT_COVERAGE_STATUS(0, 3), "Missing");
 assert.equal(context.window.STACKFIT_CONTEXT_LEVEL(handshake.task), 2, "Handshake Context must be Medium");
 assert.equal(context.window.STACKFIT_LONG_HORIZON_LEVEL(handshake.task), 2, "Handshake Long-horizon must be Medium");
 
+const handshakeGovernanceWorkflow = {
+  task: "Analyze CSM notes to detect AI governance signals. Redact personal names before classification, classify each signal across governance dimensions, assess confidence, dynamically identify minority business segments for fairness monitoring, and route ambiguous or equity-sensitive cases for human review. Store the resulting governance signals for internal Product/Compliance monitoring.",
+  answers: {
+    data: "Personal or confidential data",
+    impact: "Moderate impact — time or money lost",
+    operation: "Act after human approval",
+    inputs: "Current or private knowledge sources"
+  }
+};
+const handshakeGovernance = context.window.STACKFIT_GOVERNANCE_ASSESSMENT(handshakeGovernanceWorkflow.task, handshakeGovernanceWorkflow.answers);
+const handshakeCapabilities = context.window.STACKFIT_CAPABILITY_ASSESSMENT(handshakeGovernanceWorkflow.task, handshakeGovernanceWorkflow.answers);
+const handshakeStack = { llm: "gpt-5-nano", database: "Supabase", orchestration: "n8n", approval: "CSM human review", monitoring: "Notion", guardrails: "PII redaction step", evaluation: "Hoppscotch", execution: "n8n Webhook", other: "Equity Watch" };
+const handshakeCategories = context.window.STACKFIT_TOOL_CATEGORIES.filter(category => handshakeStack[category.id]);
+const handshakeTechnicalGaps = context.window.STACKFIT_CAPABILITIES.filter(capability => {
+  const coveringCount = handshakeCategories.filter(category => category.covers.includes(capability.id)).length;
+  const coverage = context.window.STACKFIT_COVERAGE_STATUS(coveringCount, handshakeCapabilities[capability.id]);
+  return context.window.STACKFIT_IS_BLOCKING_TECHNICAL_GAP(coverage, handshakeCapabilities[capability.id]);
+});
+assert.equal(handshakeTechnicalGaps.length, 0, "Handshake technical coverage must remain sufficient");
+assert.equal(handshakeGovernance.privacy, "review", "Handshake Privacy status must remain Review required");
+assert.equal(handshakeGovernance.security, "review", "Handshake Security status must remain Review required");
+assert.equal(context.window.STACKFIT_OVERALL_VERDICT(handshakeGovernance, 0, 0), "Fit with conditions", "Technically sufficient Handshake must retain governance conditions in the verdict");
+assert.equal(
+  context.window.STACKFIT_GOVERNANCE_SUMMARY(handshakeGovernance, true),
+  "Technical coverage is sufficient. Governance reviews and safeguards must be addressed before deployment."
+);
+
 // Exact V1 contrast scenario: internal marketing drafting, reviewed by a human,
 // with no customer data, automated publishing, API/database access, or external action.
 const marketingDraft = {
@@ -62,6 +89,7 @@ const marketingHasTechnicalGap = context.window.STACKFIT_IS_BLOCKING_TECHNICAL_G
 assert.equal(marketingHasBlocker, false);
 assert.equal(marketingHasTechnicalGap, false);
 assert.equal(context.window.STACKFIT_OVERALL_VERDICT(marketingGovernance, 0, 0), "Fit", "Marketing draft verdict must be Fit");
+assert.equal(context.window.STACKFIT_GOVERNANCE_SUMMARY(marketingGovernance, true), "No specific governance blocker or unresolved condition was identified.");
 
 const recruitment = {
   task: "Use AI to score job applicants based on CVs and interview notes, rank candidates, and automatically reject applicants below a defined score. Recruiters review only the remaining candidates.",

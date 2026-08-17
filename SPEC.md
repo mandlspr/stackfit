@@ -222,6 +222,10 @@ What governance controls or blockers exist.
 
 Rules:
 - Governance blockers cannot be offset by technical performance.
+- `Fit` requires sufficient technical coverage and no unresolved governance safeguards, reviews, mandatory controls, or blockers that materially condition deployment.
+- `Fit with conditions` applies when the stack is technically sufficient or correctable and no prohibited condition exists, but governance safeguards, reviews, or mandatory controls must be resolved before or during deployment.
+- A meaningful `🟠 Review required` prevents a simple `Fit`. Unresolved `🟡 Safeguards required` also produces `Fit with conditions` when the safeguards materially condition deployment.
+- Aggregate the technical result and governance conditions into the verdict; do not mechanically copy a single worst status color.
 - `Overbuilt` means the stack is viable but unnecessarily complex/costly.
 - Do not automatically redesign the architecture when a blocker exists.
 
