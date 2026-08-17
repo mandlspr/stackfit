@@ -314,7 +314,7 @@ High
 
 Final verdict
 
-● Fit
+● Fit with conditions
 
 Technical condition:
 
@@ -322,7 +322,7 @@ The entered stack covers the task’s material technical requirements.
 
 Governance condition:
 
-No governance blocker was identified; apply the listed safeguards.
+Technical coverage is sufficient. Governance reviews and safeguards must be addressed before deployment.
 
 What this test proved
 
@@ -343,6 +343,8 @@ gpt-5-nano
 + Equity Watch
 
 It also proved that technical fit and governance fit must remain separate.
+
+Technical fit does not override unresolved governance conditions.
 
 Corrections triggered
 
@@ -598,7 +600,7 @@ Medium
 
 Medium / controlled
 
-Fit + safeguards/review
+Fit with conditions
 
 Recruitment scoring
 
@@ -606,7 +608,7 @@ High-impact / regulated
 
 High
 
-Mandatory controls / current design requires intervention
+Not viable
 
 The important result is not only the final label.
 
@@ -678,7 +680,7 @@ Marketing draft
 → minimal stack is enough
 
 Handshake
-→ current stack is enough, but safeguards matter
+→ Fit with conditions; technical coverage is sufficient, but governance reviews and safeguards must be addressed
 
 Recruitment scoring
-→ stronger governance controls are mandatory
+→ Not viable; stronger governance controls are mandatory
